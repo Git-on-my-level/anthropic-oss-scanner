@@ -52,9 +52,9 @@ RUN python3 -m venv /opt/venv \
 
 WORKDIR /src
 
-# webrtcvad imports pkg_resources. Install setuptools after `uv pip sync` so the
-# lockfile cannot uninstall it.
-RUN /opt/venv/bin/pip install --no-cache-dir setuptools
+# webrtcvad imports pkg_resources, which setuptools 82 removed from the top level.
+# Pin <81 after `uv pip sync` (the lock currently resolves setuptools 82).
+RUN /opt/venv/bin/pip install --no-cache-dir 'setuptools>=70,<81'
 
 # Cheap offline smoke. Do not abort the image build if a test fails.
 # ENCRYPTION_SECRET is the dummy value backend/test.sh uses; not a production secret.
