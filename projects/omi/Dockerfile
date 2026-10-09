@@ -52,10 +52,12 @@ RUN python3 -m venv /opt/venv \
 
 WORKDIR /src
 
-# Cheap offline smoke: imports plus a few unit files from the single-process-safe
-# subset. Do not abort the image build if a test fails. ENCRYPTION_SECRET is the
-# dummy value backend/test.sh uses; it is not a production secret.
-# Full offline unit-test notes belong in the enrolment PR, not a 45-minute build.
+# webrtcvad imports pkg_resources. Install setuptools after `uv pip sync` so the
+# lockfile cannot uninstall it.
+RUN /opt/venv/bin/pip install --no-cache-dir setuptools
+
+# Cheap offline smoke. Do not abort the image build if a test fails.
+# ENCRYPTION_SECRET is the dummy value backend/test.sh uses; not a production secret.
 RUN ENCRYPTION_SECRET="omi_ZwB2ZNqB2HHpMK6wStk7sTpavJiPTFg7gXUHnc4tFABPU6pZ2c2DKgehtfgi4RZv" \
     OPENAI_API_KEY="test-openai-key-not-real" \
     python -c "import fastapi, firebase_admin, stripe, opuslib, webrtcvad, pytest, fakeredis, fake_firestore, uvicorn" \
